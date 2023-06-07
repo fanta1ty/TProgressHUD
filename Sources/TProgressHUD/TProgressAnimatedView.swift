@@ -57,13 +57,13 @@ public class TProgressAnimatedView: UIView {
     }
 
     private func layoutAnimatedLayer() {
-        let layer: CALayer? = ringAnimatedLayer
-        layer?.addSublayer(layer!)
+        let newLayer = ringAnimatedLayer
+        layer.addSublayer(newLayer)
 
-        let widthDiff: CGFloat? = bounds.size.width - layer!.bounds.size.width
-        let heightDiff: CGFloat? = bounds.size.height - layer!.bounds.size.height
-        layer?.position.x += (widthDiff ?? 0) / 2 - widthDiff! / 2
-        layer?.position.y += (heightDiff ?? 0) / 2 - heightDiff! / 2
+        let widthDiff: CGFloat = bounds.size.width - newLayer.bounds.size.width
+        let heightDiff: CGFloat = bounds.size.height - newLayer.bounds.size.height
+        newLayer.position.x += widthDiff / 2.0 - widthDiff / 2.0
+        newLayer.position.y += heightDiff / 2.0 - heightDiff / 2.0
     }
 
     override public var frame: CGRect {

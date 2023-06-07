@@ -1067,8 +1067,11 @@ extension TProgressHUD {
     private func positionHUD(notification: Notification?) {
         var keyboardHeight: CGFloat = 0
         var animationDuration: Double = 0
+        
+        if let windowFrame = UIApplication.shared.delegate?.window??.bounds {
+            frame = windowFrame
+        }
 
-        frame = UIApplication.shared.delegate!.window!!.bounds
         let orientation = UIApplication.shared.statusBarOrientation
 
         if notification != nil {
@@ -1225,66 +1228,67 @@ extension TProgressHUD {
         progress: CGFloat,
         status: String
     ) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            if self.fadeOutTimer != nil {
-                self.activityCount = 0
+        weak var weakSelf = self
+        OperationQueue.main.addOperation {
+            guard let strongSelf = weakSelf else { return }
+
+            if strongSelf.fadeOutTimer != nil {
+                strongSelf.activityCount = 0
             }
 
-            self.fadeOutTimer = nil
-            self.graceTimer = nil
-            self.updateViewHierarchy()
+            strongSelf.fadeOutTimer = nil
+            strongSelf.graceTimer = nil
+            strongSelf.updateViewHierarchy()
 
-            self.imageView.isHidden = true
-            self.imageView.image = nil
+            strongSelf.imageView.isHidden = true
+            strongSelf.imageView.image = nil
 
-            self.statusLabel.isHidden = status.isEmpty
-            self.statusLabel.text = status
-            self.progress = progress
+            strongSelf.statusLabel.isHidden = status.isEmpty
+            strongSelf.statusLabel.text = status
+            strongSelf.progress = progress
 
             if progress >= 0 {
-                self.cancelIndefiniteAnimatedViewAnimation()
+                strongSelf.cancelIndefiniteAnimatedViewAnimation()
 
-                if self.ringView.superview == nil {
-                    self.hudView.contentView.addSubview(self.ringView)
+                if strongSelf.ringView.superview == nil {
+                    strongSelf.hudView.contentView.addSubview(strongSelf.ringView)
                 }
-                if self.backgroundRingView.superview == nil {
-                    self.hudView.contentView.addSubview(self.backgroundRingView)
+                if strongSelf.backgroundRingView.superview == nil {
+                    strongSelf.hudView.contentView.addSubview(strongSelf.backgroundRingView)
                 }
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)
-                self.ringView.strokeEnd = progress
+                strongSelf.ringView.strokeEnd = progress
                 CATransaction.commit()
 
                 if progress == 0 {
-                    self.activityCount += 1
+                    strongSelf.activityCount += 1
                 }
             } else {
-                self.cancelRingLayerAnimation()
-                self.hudView.contentView.addSubview(self.indefiniteAnimatedView)
+                strongSelf.cancelRingLayerAnimation()
+                strongSelf.hudView.contentView.addSubview(strongSelf.indefiniteAnimatedView)
 
-                if self.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
-                    self.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
+                if strongSelf.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
+                    strongSelf.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
                 }
 
-                self.activityCount += 1
+                strongSelf.activityCount += 1
             }
 
             if self.graceTimeInterval > 0, self.backgroundView.alpha == 0 {
-                self.graceTimer = Timer(
+                strongSelf.graceTimer = Timer(
                     timeInterval: self.graceTimeInterval,
-                    target: self,
+                    target: strongSelf,
                     selector: #selector(self.fadeIn),
                     userInfo: nil,
                     repeats: false
                 )
-                RunLoop.main.add(self.graceTimer!, forMode: RunLoop.Mode.common)
+                RunLoop.main.add(strongSelf.graceTimer!, forMode: RunLoop.Mode.common)
             } else {
-                self.fadeIn(nil)
+                strongSelf.fadeIn(nil)
             }
 
-            self.hapticGenerator?.prepare()
+            strongSelf.hapticGenerator?.prepare()
         }
     }
 
