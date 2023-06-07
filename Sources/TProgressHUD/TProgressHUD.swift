@@ -17,13 +17,13 @@ public let TProgressHUDDidAppearNotification = "TProgressHUDDidAppearNotificatio
 
 public let TProgressHUDStatusUserInfoKey = "TProgressHUDStatusUserInfoKey"
 
-public enum TProgressHUDStyle : Int {
+public enum TProgressHUDStyle: Int {
     case light,
          dark,
          custom
 }
 
-public enum TProgressHUDMaskType : Int {
+public enum TProgressHUDMaskType: Int {
     case none = 1,
          clear,
          black,
@@ -31,7 +31,7 @@ public enum TProgressHUDMaskType : Int {
          custom
 }
 
-public enum TProgressHUDAnimationType : Int {
+public enum TProgressHUDAnimationType: Int {
     case flat,
          native
 }
@@ -50,7 +50,7 @@ public class TProgressHUD: UIView {
     public static let sharedView = TProgressHUD(
         frame: UIApplication.shared.delegate?.window??.bounds ?? .zero
     )
-    
+
     public var defaultStyle: TProgressHUDStyle = .light
     public var defaultMaskType: TProgressHUDMaskType = .none
     public var defaultAnimationType: TProgressHUDAnimationType = .flat
@@ -64,28 +64,28 @@ public class TProgressHUD: UIView {
     public var customBackgroundColor: UIColor = .white
     public var foregroundColor: UIColor = .black
     public var foregroundImageColor: UIColor?
-    public var backgroundLayerColor: UIColor = UIColor(white: 0, alpha: 0.4)
+    public var backgroundLayerColor: UIColor = .init(white: 0, alpha: 0.4)
     public var imageViewSize: CGSize = .init(width: 28, height: 28)
     public var shouldTintImages: Bool = true
-    public var infoImage: UIImage = UIImage(named: "info", in: .module, compatibleWith: nil)!
-    public var successImage: UIImage = UIImage(named: "success", in: .module, compatibleWith: nil)!
-    public var errorImage: UIImage = UIImage(named: "error", in: .module, compatibleWith: nil)!
+    public var infoImage: UIImage = .init(named: "info", in: .module, compatibleWith: nil)!
+    public var successImage: UIImage = .init(named: "success", in: .module, compatibleWith: nil)!
+    public var errorImage: UIImage = .init(named: "error", in: .module, compatibleWith: nil)!
     public var viewForExtension: UIView? = nil
     public var graceTimeInterval: TimeInterval = 0
     public var minimumDismissTimeInterval: TimeInterval = 5
     public var maximumDismissTimeInterval: TimeInterval = CGFLOAT_MAX
-    
+
     private var _offsetFromCenter: UIOffset = .zero
     public var offsetFromCenter: UIOffset! {
-        get { return _offsetFromCenter }
+        get { _offsetFromCenter }
         set { _offsetFromCenter = newValue }
     }
-    
+
     public var fadeInAnimationDuration: TimeInterval = 0.15
     public var fadeOutAnimationDuration: TimeInterval = 0.15
-    
+
     public var maxSupportedWindowLevel: UIWindow.Level = .normal
-    
+
     public var hapticsEnabled: Bool = false
     public var motionEffectEnabled: Bool = true
 
@@ -97,13 +97,13 @@ public class TProgressHUD: UIView {
                 _graceTimer!.invalidate()
                 _graceTimer = nil
             }
-            
+
             if newValue != nil {
                 _graceTimer = newValue
             }
         }
     }
-    
+
     private var _fadeOutTimer: Timer?
     private var fadeOutTimer: Timer? {
         get { _fadeOutTimer }
@@ -112,7 +112,7 @@ public class TProgressHUD: UIView {
                 _fadeOutTimer!.invalidate()
                 _fadeOutTimer = nil
             }
-            
+
             if newValue != nil {
                 _fadeOutTimer = newValue
             }
@@ -140,7 +140,7 @@ public class TProgressHUD: UIView {
         }
         set { _controlView = newValue }
     }
-    
+
     private var _backgroundView: UIView?
     private var backgroundView: UIView {
         get {
@@ -160,7 +160,7 @@ public class TProgressHUD: UIView {
                 }
                 _backgroundView!.backgroundColor = .clear
             } else {
-                if backgroundRadialGradientLayer != nil && backgroundRadialGradientLayer!.superlayer != nil {
+                if backgroundRadialGradientLayer != nil, backgroundRadialGradientLayer!.superlayer != nil {
                     backgroundRadialGradientLayer!.removeFromSuperlayer()
                 }
                 if defaultMaskType == .black {
@@ -185,7 +185,7 @@ public class TProgressHUD: UIView {
         }
         set { _backgroundView = newValue }
     }
-    
+
     private var backgroundRadialGradientLayer: TRadialGradientLayer?
     private var _hudView: UIVisualEffectView?
     private var hudView: UIVisualEffectView {
@@ -193,14 +193,14 @@ public class TProgressHUD: UIView {
             if _hudView == nil {
                 _hudView = UIVisualEffectView()
                 _hudView!.layer.masksToBounds = true
-                _hudView?.autoresizingMask = [
+                _hudView!.autoresizingMask = [
                     .flexibleBottomMargin,
-                        .flexibleTopMargin,
-                        .flexibleRightMargin,
-                    .flexibleLeftMargin
+                    .flexibleTopMargin,
+                    .flexibleRightMargin,
+                    .flexibleLeftMargin,
                 ]
             }
-            
+
             if _hudView!.superview == nil {
                 addSubview(_hudView!)
             }
@@ -209,6 +209,7 @@ public class TProgressHUD: UIView {
         }
         set { _hudView = newValue }
     }
+
     private var hudViewCustomBlurEffect: UIBlurEffect?
     private var _statusLabel: UILabel?
     private var statusLabel: UILabel {
@@ -224,17 +225,18 @@ public class TProgressHUD: UIView {
             if _statusLabel!.superview == nil {
                 hudView.contentView.addSubview(_statusLabel!)
             }
-            
+
             _statusLabel!.textColor = foregroundColorForStyle
             _statusLabel!.font = font
             return _statusLabel!
         }
         set { _statusLabel = newValue }
     }
+
     private var _imageView: UIImageView?
     private var imageView: UIImageView {
         get {
-            if _imageView != nil && CGSizeEqualToSize(_imageView!.bounds.size, imageViewSize) {
+            if _imageView != nil, CGSizeEqualToSize(_imageView!.bounds.size, imageViewSize) {
                 _imageView!.removeFromSuperview()
                 _imageView = nil
             }
@@ -243,7 +245,8 @@ public class TProgressHUD: UIView {
                     x: 0,
                     y: 0,
                     width: imageViewSize.width,
-                    height: imageViewSize.height)
+                    height: imageViewSize.height
+                )
                 )
             }
             if _imageView!.superview == nil {
@@ -258,41 +261,41 @@ public class TProgressHUD: UIView {
     private var indefiniteAnimatedView: UIView {
         get {
             if defaultAnimationType == .flat {
-                if _indefiniteAnimatedView != nil && !(_indefiniteAnimatedView is TIndefiniteAnimatedView) {
+                if _indefiniteAnimatedView != nil, !(_indefiniteAnimatedView is TIndefiniteAnimatedView) {
                     _indefiniteAnimatedView!.removeFromSuperview()
                     _indefiniteAnimatedView = nil
                 }
-                
+
                 if _indefiniteAnimatedView == nil {
                     _indefiniteAnimatedView = TIndefiniteAnimatedView(frame: .zero)
                 }
-                
+
                 if let animatedView = _indefiniteAnimatedView as? TIndefiniteAnimatedView {
                     animatedView.strokeColor = foregroundColorForStyle
                     animatedView.strokeThickness = ringThickness
                     animatedView.radius = statusLabel.text != nil ? ringRadius : ringNoTextRadius
                 }
             } else {
-                if _indefiniteAnimatedView != nil && !(_indefiniteAnimatedView is UIActivityIndicatorView) {
+                if _indefiniteAnimatedView != nil, !(_indefiniteAnimatedView is UIActivityIndicatorView) {
                     _indefiniteAnimatedView!.removeFromSuperview()
                     _indefiniteAnimatedView = nil
                 }
-                
+
                 if _indefiniteAnimatedView == nil {
                     _indefiniteAnimatedView = UIActivityIndicatorView(style: .whiteLarge)
                 }
-                
+
                 if let animatedView = _indefiniteAnimatedView as? UIActivityIndicatorView {
                     animatedView.color = foregroundColorForStyle
                 }
             }
-            
+
             _indefiniteAnimatedView!.sizeToFit()
             return _indefiniteAnimatedView!
         }
         set { _indefiniteAnimatedView = newValue }
     }
-    
+
     private var _ringView: TProgressAnimatedView?
     private var ringView: TProgressAnimatedView {
         get {
@@ -306,7 +309,7 @@ public class TProgressHUD: UIView {
         }
         set { _ringView = newValue }
     }
-    
+
     private var _backgroundRingView: TProgressAnimatedView?
     private var backgroundRingView: TProgressAnimatedView {
         get {
@@ -314,7 +317,7 @@ public class TProgressHUD: UIView {
                 _backgroundRingView = TProgressAnimatedView(frame: .zero)
                 _backgroundRingView!.strokeEnd = 1.0
             }
-            
+
             _backgroundRingView!.strokeColor = foregroundColorForStyle.withAlphaComponent(0.1)
             _backgroundRingView!.strokeThickness = ringThickness
             _backgroundRingView!.radius = statusLabel.text != nil ? ringRadius : ringNoTextRadius
@@ -322,7 +325,7 @@ public class TProgressHUD: UIView {
         }
         set { _backgroundRingView = newValue }
     }
-    
+
     private var progress: CGFloat = 0.0
     private var activityCount: UInt = 0
 
@@ -336,7 +339,7 @@ public class TProgressHUD: UIView {
                     break
                 }
             }
-            
+
             if let keyboardWindowSubviews = keyboardWindow?.subviews {
                 for possibleKeyboard in keyboardWindowSubviews {
                     let viewName = String(describing: type(of: possibleKeyboard))
@@ -348,7 +351,7 @@ public class TProgressHUD: UIView {
                                 let viewName = String(describing: type(of: possibleKeyboardSubview))
                                 if viewName.hasPrefix("UI"), viewName.hasSuffix("InputSetHostView") {
                                     let convertedRect = possibleKeyboard.convert(possibleKeyboardSubview.frame, to: self)
-                                    let intersectedRect = convertedRect.intersection(self.bounds)
+                                    let intersectedRect = convertedRect.intersection(bounds)
 
                                     if !intersectedRect.isNull {
                                         return intersectedRect.height
@@ -368,41 +371,41 @@ public class TProgressHUD: UIView {
     private var frontWindow: UIWindow? {
         get {
             let frontToBackWindows = UIApplication.shared.windows.reversed()
-            
+
             for window in frontToBackWindows {
                 let windowOnMainScreen = window.screen == UIScreen.main
                 let windowIsVisible = !window.isHidden && (window.alpha > 0)
                 let windowLevelSupported = window.windowLevel >= .normal && window.windowLevel <= maxSupportedWindowLevel
                 let windowKeyWindow = window.isKeyWindow
-                
-                if windowOnMainScreen && windowIsVisible && windowLevelSupported && windowKeyWindow {
+
+                if windowOnMainScreen, windowIsVisible, windowLevelSupported, windowKeyWindow {
                     return window
                 }
             }
-            
+
             return nil
         }
         set { _frontWindow = newValue }
     }
-    
+
     private var _hapticGenerator: UINotificationFeedbackGenerator?
     private var hapticGenerator: UINotificationFeedbackGenerator? {
         get {
             if !hapticsEnabled {
                 return nil
             }
-            
+
             if _hapticGenerator == nil {
                 _hapticGenerator = UINotificationFeedbackGenerator()
             }
-            
+
             return _hapticGenerator
         }
         set { _hapticGenerator = newValue }
     }
-    
+
     private var isInitializing = false
-    
+
     private var foregroundColorForStyle: UIColor {
         if defaultStyle == .light {
             return .black
@@ -412,7 +415,7 @@ public class TProgressHUD: UIView {
             return foregroundColor
         }
     }
-    
+
     private var foregroundImageColorForStyle: UIColor {
         if foregroundImageColor != nil {
             return foregroundImageColor!
@@ -420,7 +423,7 @@ public class TProgressHUD: UIView {
             return foregroundColorForStyle
         }
     }
-    
+
     private var backgroundColorForStyle: UIColor {
         if defaultStyle == .light {
             return .white
@@ -430,217 +433,219 @@ public class TProgressHUD: UIView {
             return customBackgroundColor
         }
     }
-    
+
     private var notificationUserInfo: [AnyHashable: Any]? {
-        return statusLabel.text != nil ? [TProgressHUDStatusUserInfoKey: statusLabel.text!] : nil
+        statusLabel.text != nil ? [TProgressHUDStatusUserInfoKey: statusLabel.text!] : nil
     }
-    
-    public override init(frame: CGRect) {
+
+    override public init(frame: CGRect) {
         super.init(frame: frame)
-        
-        isInitializing = true
-        
+
+        self.isInitializing = true
+
         isUserInteractionEnabled = false
-        activityCount = 0
+        self.activityCount = 0
         backgroundView.alpha = 0
         imageView.alpha = 0
         statusLabel.alpha = 0
         indefiniteAnimatedView.alpha = 0
         ringView.alpha = 0
         backgroundRingView.alpha = 0
-        
-        customBackgroundColor = .white
-        foregroundColor = .black
-        backgroundLayerColor = .init(white: 0, alpha: 0.4)
-        
-        defaultMaskType = .none
-        defaultStyle = .light
-        defaultAnimationType = .flat
-        minimumSize = .zero
-        font = .preferredFont(forTextStyle: .headline)
-        
-        imageViewSize = .init(width: 28, height: 28)
-        shouldTintImages = true
-        
-        infoImage = UIImage(named: "info", in: .module, compatibleWith: nil)!
-        successImage = UIImage(named: "success", in: .module, compatibleWith: nil)!
-        errorImage = UIImage(named: "error", in: .module, compatibleWith: nil)!
-        
-        ringThickness = 2
-        ringRadius = 18
-        ringNoTextRadius = 24
-        
-        cornerRadius = 14
-        
-        graceTimeInterval = 0
-        minimumDismissTimeInterval = 5
-        maximumDismissTimeInterval = CGFLOAT_MAX
-        
-        fadeInAnimationDuration = TProgressHUDDefaultAnimationDuration
-        fadeOutAnimationDuration = TProgressHUDDefaultAnimationDuration
-        
-        maxSupportedWindowLevel = .normal
-        
-        hapticsEnabled = false
-        motionEffectEnabled = false
-        
+
+        self.customBackgroundColor = .white
+        self.foregroundColor = .black
+        self.backgroundLayerColor = .init(white: 0, alpha: 0.4)
+
+        self.defaultMaskType = .none
+        self.defaultStyle = .light
+        self.defaultAnimationType = .flat
+        self.minimumSize = .zero
+        self.font = .preferredFont(forTextStyle: .headline)
+
+        self.imageViewSize = .init(width: 28, height: 28)
+        self.shouldTintImages = true
+
+        self.infoImage = UIImage(named: "info", in: .module, compatibleWith: nil)!
+        self.successImage = UIImage(named: "success", in: .module, compatibleWith: nil)!
+        self.errorImage = UIImage(named: "error", in: .module, compatibleWith: nil)!
+
+        self.ringThickness = 2
+        self.ringRadius = 18
+        self.ringNoTextRadius = 24
+
+        self.cornerRadius = 14
+
+        self.graceTimeInterval = 0
+        self.minimumDismissTimeInterval = 5
+        self.maximumDismissTimeInterval = CGFLOAT_MAX
+
+        self.fadeInAnimationDuration = TProgressHUDDefaultAnimationDuration
+        self.fadeOutAnimationDuration = TProgressHUDDefaultAnimationDuration
+
+        self.maxSupportedWindowLevel = .normal
+
+        self.hapticsEnabled = false
+        self.motionEffectEnabled = false
+
         accessibilityIdentifier = "TProgressHUD"
         isAccessibilityElement = true
-        
-        isInitializing = false
+
+        self.isInitializing = false
     }
-    
-    required init?(coder: NSCoder) {
+
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
 // MARK: - Public Static Functions
-extension TProgressHUD {
-    public static func setStatus(status: String) {
+
+public extension TProgressHUD {
+    static func setStatus(status: String) {
         sharedView.setStatus(status: status)
     }
-    
-    public static func setDefaultStyle(style: TProgressHUDStyle) {
+
+    static func setDefaultStyle(style: TProgressHUDStyle) {
         sharedView.defaultStyle = style
     }
-    
-    public static func setDefaultMaskType(maskType: TProgressHUDMaskType) {
+
+    static func setDefaultMaskType(maskType: TProgressHUDMaskType) {
         sharedView.defaultMaskType = maskType
     }
-    
-    public static func setDefaultAnimationType(type: TProgressHUDAnimationType) {
+
+    static func setDefaultAnimationType(type: TProgressHUDAnimationType) {
         sharedView.defaultAnimationType = type
     }
-    
-    public static func setContainerView(containerView: UIView?) {
+
+    static func setContainerView(containerView: UIView?) {
         sharedView.containerView = containerView
     }
-    
-    public static func setMinimumSize(minimumSize: CGSize) {
+
+    static func setMinimumSize(minimumSize: CGSize) {
         sharedView.minimumSize = minimumSize
     }
-    
-    public static func setRingThickness(ringThickness: CGFloat) {
+
+    static func setRingThickness(ringThickness: CGFloat) {
         sharedView.ringThickness = ringThickness
     }
-    
-    public static func setRingRadius(radius: CGFloat) {
+
+    static func setRingRadius(radius: CGFloat) {
         sharedView.ringRadius = radius
     }
-    
-    public static func setRingNoTextRadius(radius: CGFloat) {
+
+    static func setRingNoTextRadius(radius: CGFloat) {
         sharedView.ringNoTextRadius = radius
     }
-    
-    public static func setCornerRadius(cornerRadius: CGFloat) {
+
+    static func setCornerRadius(cornerRadius: CGFloat) {
         sharedView.cornerRadius = cornerRadius
     }
-    
-    public static func setBorderColor(color: UIColor) {
+
+    static func setBorderColor(color: UIColor) {
         sharedView.hudView.layer.borderColor = color.cgColor
     }
-    
-    public static func setBorderWidth(width: CGFloat) {
+
+    static func setBorderWidth(width: CGFloat) {
         sharedView.hudView.layer.borderWidth = width
     }
-    
-    public static func setFont(font: UIFont) {
+
+    static func setFont(font: UIFont) {
         sharedView.font = font
     }
-    
-    public static func setForegroundColor(color: UIColor) {
+
+    static func setForegroundColor(color: UIColor) {
         sharedView.foregroundColor = color
         setDefaultStyle(style: .custom)
     }
-    
-    public static func setForegroundImageColor(color: UIColor) {
+
+    static func setForegroundImageColor(color: UIColor) {
         sharedView.foregroundImageColor = color
         setDefaultStyle(style: .custom)
     }
-    
-    public static func setBackgroundColor(color: UIColor) {
+
+    static func setBackgroundColor(color: UIColor) {
         sharedView.backgroundColor = color
         setDefaultStyle(style: .custom)
     }
-    
-    public static func setHudViewCustomBlurEffect(blurEffect: UIBlurEffect) {
+
+    static func setHudViewCustomBlurEffect(blurEffect: UIBlurEffect) {
         sharedView.hudViewCustomBlurEffect = blurEffect
         setDefaultStyle(style: .custom)
     }
-    
-    public static func setBackgroundLayerColor(color: UIColor) {
+
+    static func setBackgroundLayerColor(color: UIColor) {
         sharedView.backgroundLayerColor = color
     }
-    
-    public static func setImageViewSize(size: CGSize) {
+
+    static func setImageViewSize(size: CGSize) {
         sharedView.imageViewSize = size
     }
-    
-    public static func setShouldTintImages(shouldTintImages: Bool) {
+
+    static func setShouldTintImages(shouldTintImages: Bool) {
         sharedView.shouldTintImages = shouldTintImages
     }
-    
-    public static func setInfoImage(image: UIImage) {
+
+    static func setInfoImage(image: UIImage) {
         sharedView.infoImage = image
     }
-    
-    public static func setSuccessImage(image: UIImage) {
+
+    static func setSuccessImage(image: UIImage) {
         sharedView.successImage = image
     }
-    
-    public static func setErrorImage(image: UIImage) {
+
+    static func setErrorImage(image: UIImage) {
         sharedView.errorImage = image
     }
-    
-    public static func setViewForExtension(view: UIView) {
+
+    static func setViewForExtension(view: UIView) {
         sharedView.viewForExtension = view
     }
-    
-    public static func setGraceTimeInterval(interval: TimeInterval) {
+
+    static func setGraceTimeInterval(interval: TimeInterval) {
         sharedView.graceTimeInterval = interval
     }
-    
-    public static func setMinimumDismissTimeInterval(interval: TimeInterval) {
+
+    static func setMinimumDismissTimeInterval(interval: TimeInterval) {
         sharedView.minimumDismissTimeInterval = interval
     }
-    
-    public static func setMaximumDismissTimeInterval(interval: TimeInterval) {
+
+    static func setMaximumDismissTimeInterval(interval: TimeInterval) {
         sharedView.maximumDismissTimeInterval = interval
     }
-    
-    public static func setFadeInAnimationDuration(duration: TimeInterval) {
+
+    static func setFadeInAnimationDuration(duration: TimeInterval) {
         sharedView.fadeInAnimationDuration = duration
     }
-    
-    public static func setFadeOutAnimationDuration(duration: TimeInterval) {
+
+    static func setFadeOutAnimationDuration(duration: TimeInterval) {
         sharedView.fadeOutAnimationDuration = duration
     }
-    
-    public static func setMaxSupportedWindowLevel(windowLevel: UIWindow.Level) {
+
+    static func setMaxSupportedWindowLevel(windowLevel: UIWindow.Level) {
         sharedView.maxSupportedWindowLevel = windowLevel
     }
-    
-    public static func setHapticsEnabled(hapticsEnabled: Bool) {
+
+    static func setHapticsEnabled(hapticsEnabled: Bool) {
         sharedView.hapticsEnabled = hapticsEnabled
     }
-    
-    public static func setMotionEffectEnabled(motionEffectEnabled: Bool) {
+
+    static func setMotionEffectEnabled(motionEffectEnabled: Bool) {
         sharedView.motionEffectEnabled = motionEffectEnabled
     }
-    
-    public static func isVisible() -> Bool {
+
+    static func isVisible() -> Bool {
         sharedView.backgroundView.alpha > 0
     }
 }
 
 // MARK: - Show Functions
-extension TProgressHUD {
-    public static func show() {
+
+public extension TProgressHUD {
+    static func show() {
         showWithStatus(status: "")
     }
-    
-    public static func showWithMaskType(
+
+    static func showWithMaskType(
         maskType: TProgressHUDMaskType
     ) {
         let existingMaskType = sharedView.defaultMaskType
@@ -648,8 +653,8 @@ extension TProgressHUD {
         show()
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showWithStatus(
+
+    static func showWithStatus(
         status: String
     ) {
         showProgress(
@@ -657,8 +662,8 @@ extension TProgressHUD {
             status: status
         )
     }
-    
-    public static func showWithStatus(
+
+    static func showWithStatus(
         status: String,
         maskType: TProgressHUDMaskType
     ) {
@@ -667,8 +672,8 @@ extension TProgressHUD {
         showWithStatus(status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showProgress(
+
+    static func showProgress(
         progress: CGFloat
     ) {
         showProgress(
@@ -676,8 +681,8 @@ extension TProgressHUD {
             status: ""
         )
     }
-    
-    public static func showProgress(
+
+    static func showProgress(
         progress: CGFloat,
         maskType: TProgressHUDMaskType
     ) {
@@ -686,15 +691,15 @@ extension TProgressHUD {
         showProgress(progress: progress)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showProgress(
+
+    static func showProgress(
         progress: CGFloat,
         status: String
     ) {
         sharedView.showProgress(progress: progress, status: status)
     }
-    
-    public static func showProgress(
+
+    static func showProgress(
         progress: CGFloat,
         status: String,
         maskType: TProgressHUDMaskType
@@ -704,18 +709,18 @@ extension TProgressHUD {
         sharedView.showProgress(progress: progress, status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showInfoWithStatus(
+
+    static func showInfoWithStatus(
         status: String
     ) {
         showImage(image: sharedView.infoImage, status: status)
-        
+
         DispatchQueue.main.async {
             sharedView.hapticGenerator?.notificationOccurred(.warning)
         }
     }
-    
-    public static func showInfoWithStatus(
+
+    static func showInfoWithStatus(
         status: String,
         maskType: TProgressHUDMaskType
     ) {
@@ -724,18 +729,18 @@ extension TProgressHUD {
         showInfoWithStatus(status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showSuccessWithStatus(
+
+    static func showSuccessWithStatus(
         status: String
     ) {
         showImage(image: sharedView.successImage, status: status)
-        
+
         DispatchQueue.main.async {
             sharedView.hapticGenerator?.notificationOccurred(.success)
         }
     }
-    
-    public static func showSuccessWithStatus(
+
+    static func showSuccessWithStatus(
         status: String,
         maskType: TProgressHUDMaskType
     ) {
@@ -744,18 +749,18 @@ extension TProgressHUD {
         showSuccessWithStatus(status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showErrorWithStatus(
+
+    static func showErrorWithStatus(
         status: String
     ) {
         showImage(image: sharedView.errorImage, status: status)
-        
+
         DispatchQueue.main.async {
             sharedView.hapticGenerator?.notificationOccurred(.error)
         }
     }
-    
-    public static func showErrorWithStatus(
+
+    static func showErrorWithStatus(
         status: String,
         maskType: TProgressHUDMaskType
     ) {
@@ -764,8 +769,8 @@ extension TProgressHUD {
         showErrorWithStatus(status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func showImage(
+
+    static func showImage(
         image: UIImage,
         status: String
     ) {
@@ -776,8 +781,8 @@ extension TProgressHUD {
             duration: displayInterval
         )
     }
-    
-    public static func showImage(
+
+    static func showImage(
         image: UIImage,
         status: String,
         maskType: TProgressHUDMaskType
@@ -787,15 +792,15 @@ extension TProgressHUD {
         showImage(image: image, status: status)
         setDefaultMaskType(maskType: existingMaskType)
     }
-    
-    public static func displayDurationForString(
+
+    static func displayDurationForString(
         string: String
     ) -> TimeInterval {
         let minimum = max(CGFloat(string.count) * 0.06 + 0.5, sharedView.minimumDismissTimeInterval)
         return min(minimum, sharedView.maximumDismissTimeInterval)
     }
-    
-    public static func popActivity() {
+
+    static func popActivity() {
         if sharedView.activityCount > 0 {
             sharedView.activityCount -= 1
         }
@@ -803,30 +808,30 @@ extension TProgressHUD {
             sharedView.dismiss()
         }
     }
-    
-    public static func dismiss() {
+
+    static func dismiss() {
         dismissWithDelay(
             delay: 0,
             completion: nil
         )
     }
-    
-    public static func dismissWithCompletion(
-        completion: TProgressHUDDismissCompletion
+
+    static func dismissWithCompletion(
+        completion _: TProgressHUDDismissCompletion
     ) {
         dismissWithDelay(delay: 0, completion: nil)
     }
-    
-    public static func dismissWithDelay(
-        delay: TimeInterval
+
+    static func dismissWithDelay(
+        delay _: TimeInterval
     ) {
         dismissWithDelay(
             delay: 0,
             completion: nil
         )
     }
-    
-    public static func dismissWithDelay(
+
+    static func dismissWithDelay(
         delay: TimeInterval,
         completion: TProgressHUDDismissCompletion
     ) {
@@ -835,34 +840,35 @@ extension TProgressHUD {
             completion: completion
         )
     }
-    
-    public static func setOffsetFromCenter(
+
+    static func setOffsetFromCenter(
         offset: UIOffset
     ) {
         sharedView.offsetFromCenter = offset
     }
-    
-    public static func resetOffsetFromCenter() {
+
+    static func resetOffsetFromCenter() {
         setOffsetFromCenter(offset: .zero)
     }
 }
 
 // MARK: - Private Functions
+
 extension TProgressHUD {
     private func setStatus(status: String) {
         statusLabel.text = status
         statusLabel.isHidden = status.isEmpty
         updateHUDFrame()
     }
-    
+
     private func updateHUDFrame() {
         let imageUsed = imageView.image != nil && !imageView.isHidden
         let progressUsed = imageView.isHidden
-        
+
         var labelRect = CGRect.zero
         var labelHeight: CGFloat = 0
         var labelWidth: CGFloat = 0
-        
+
         if statusLabel.text != nil {
             let constraintSize = CGSizeMake(200, 300)
             labelRect = (statusLabel.text! as NSString).boundingRect(
@@ -878,27 +884,27 @@ extension TProgressHUD {
         var hudHeight: CGFloat = 0
         var contentWidth: CGFloat = 0
         var contentHeight: CGFloat = 0
-        
+
         if imageUsed || progressUsed {
             contentWidth = CGRectGetWidth(imageUsed ? imageView.frame : indefiniteAnimatedView.frame)
             contentHeight = CGRectGetHeight(imageUsed ? imageView.frame : indefiniteAnimatedView.frame)
         }
-        
+
         hudWidth = TProgressHUDHorizontalSpacing + CGFloat.maximum(labelWidth, contentWidth) + TProgressHUDHorizontalSpacing
         hudHeight = TProgressHUDVerticalSpacing + labelHeight + contentHeight + TProgressHUDVerticalSpacing
-        
+
         if statusLabel.text != nil && (imageUsed || progressUsed) {
             hudHeight += TProgressHUDLabelSpacing
         }
-        
+
         hudView.bounds = CGRectMake(0, 0, CGFloat.maximum(minimumSize.width, hudWidth), CGFloat.maximum(minimumSize.height, hudHeight))
-        
+
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        
+
         var centerY: CGFloat = 0
         if statusLabel.text != nil {
-            let yOffset: CGFloat = CGFloat.maximum(
+            let yOffset = CGFloat.maximum(
                 TProgressHUDVerticalSpacing,
                 (minimumSize.height - contentHeight - TProgressHUDLabelSpacing - labelHeight) / 2.0
             )
@@ -906,34 +912,35 @@ extension TProgressHUD {
         } else {
             centerY = CGRectGetMidY(hudView.bounds)
         }
-        
+
         indefiniteAnimatedView.center = CGPointMake(CGRectGetMidX(hudView.bounds), centerY)
-        
+
         if progress != TProgressHUDUndefinedProgress {
             let center = CGPointMake(CGRectGetMidX(hudView.bounds), centerY)
             backgroundRingView.center = center
             ringView.center = center
         }
         imageView.center = CGPointMake(CGRectGetMidX(hudView.bounds), centerY)
-        
+
         if imageUsed || progressUsed {
             centerY = CGRectGetMaxY(imageUsed ? imageView.frame : indefiniteAnimatedView.frame) + TProgressHUDLabelSpacing + labelHeight / 2.0
         } else {
             centerY = CGRectGetMidY(hudView.bounds)
         }
-        
+
         statusLabel.frame = labelRect
         statusLabel.center = CGPointMake(CGRectGetMidX(hudView.bounds), centerY)
-        
+
         CATransaction.commit()
     }
 }
 
 // MARK: - Private Action Functions
+
 extension TProgressHUD {
     @objc
     private func controlViewDidReceiveTouchEvent(
-        sender: AnyObject?,
+        sender _: AnyObject?,
         forEvent: UIEvent
     ) {
         NotificationCenter.default.post(
@@ -941,10 +948,10 @@ extension TProgressHUD {
             object: self,
             userInfo: notificationUserInfo
         )
-        
+
         guard let touch = forEvent.allTouches?.first else { return }
         let touchLocation = touch.location(in: self)
-        
+
         if CGRectContainsPoint(hudView.frame, touchLocation) {
             NotificationCenter.default.post(
                 name: NSNotification.Name(TProgressHUDDidTouchDownInsideNotification),
@@ -953,14 +960,14 @@ extension TProgressHUD {
             )
         }
     }
-    
+
     @objc
     private func fadeIn(_ data: Any?) {
         updateHUDFrame()
         positionHUD(notification: nil)
-        
+
         let accessibilityString = statusLabel.text?.components(separatedBy: .newlines).joined(separator: " ")
-        
+
         if defaultMaskType == .none {
             controlView.isUserInteractionEnabled = true
             accessibilityLabel = accessibilityString ?? "Loading"
@@ -972,42 +979,42 @@ extension TProgressHUD {
             hudView.isAccessibilityElement = true
             controlView.accessibilityViewIsModal = false
         }
-        
+
         var duration: Any?
-        
+
         if let data = data {
             duration = data is Timer ? (data as! Timer).userInfo : data
         }
-        
+
         if backgroundView.alpha != 1.0 {
             NotificationCenter.default.post(
                 name: NSNotification.Name(TProgressHUDWillAppearNotification),
                 object: self,
                 userInfo: notificationUserInfo
             )
-            
-            hudView.transform = self.hudView.transform.scaledBy(x: 1.3, y: 1.3)
-            
+
+            hudView.transform = hudView.transform.scaledBy(x: 1.3, y: 1.3)
+
             let animationsBlock: () -> Void = { [weak self] in
                 guard let self = self else { return }
                 self.hudView.transform = CGAffineTransform.identity
                 self.fadeInEffects()
             }
-            
+
             let completionBlock: () -> Void = { [weak self] in
                 guard let self = self else { return }
                 if self.backgroundView.alpha == 1.0 {
                     self.registerNotifications()
-                    
+
                     NotificationCenter.default.post(
                         name: NSNotification.Name(TProgressHUDDidAppearNotification),
                         object: self,
                         userInfo: notificationUserInfo
                     )
-                    
+
                     UIAccessibility.post(notification: .screenChanged, argument: nil)
                     UIAccessibility.post(notification: .announcement, argument: statusLabel.text)
-                    
+
                     if duration != nil {
                         self.fadeOutTimer = Timer.scheduledTimer(
                             timeInterval: duration as? Double ?? 0,
@@ -1020,7 +1027,7 @@ extension TProgressHUD {
                     }
                 }
             }
-            
+
             if fadeInAnimationDuration > 0 {
                 UIView.animate(
                     withDuration: fadeInAnimationDuration,
@@ -1037,42 +1044,44 @@ extension TProgressHUD {
                 animationsBlock()
                 completionBlock()
             }
-            
+
             setNeedsDisplay()
         } else {
             UIAccessibility.post(notification: .screenChanged, argument: nil)
             UIAccessibility.post(notification: .announcement, argument: statusLabel.text)
-            
+
             if duration != nil {
-                self.fadeOutTimer = Timer.scheduledTimer(
+                fadeOutTimer = Timer.scheduledTimer(
                     timeInterval: duration as? Double ?? 0,
                     target: self,
                     selector: #selector(dismiss),
                     userInfo: nil,
                     repeats: false
                 )
-                RunLoop.main.add(self.fadeOutTimer!, forMode: RunLoop.Mode.common)
+                RunLoop.main.add(fadeOutTimer!, forMode: RunLoop.Mode.common)
             }
         }
     }
-    
+
     @objc
     private func positionHUD(notification: Notification?) {
         var keyboardHeight: CGFloat = 0
         var animationDuration: Double = 0
-        
+
         frame = UIApplication.shared.delegate!.window!!.bounds
         let orientation = UIApplication.shared.statusBarOrientation
-        
+
         if notification != nil {
             let keyboardInfo = notification!.userInfo as! [String: Any]
             let keyboardFrame = keyboardInfo[UIResponder.keyboardFrameBeginUserInfoKey] as! CGRect
             animationDuration = keyboardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double
-            
-            if notification!.name == UIResponder.keyboardWillShowNotification ||
-                notification!.name == UIResponder.keyboardDidShowNotification {
+
+            if
+                notification!.name == UIResponder.keyboardWillShowNotification ||
+                notification!.name == UIResponder.keyboardDidShowNotification
+            {
                 keyboardHeight = CGRectGetWidth(keyboardFrame)
-                
+
                 if orientation.isPortrait {
                     keyboardHeight = CGRectGetHeight(keyboardFrame)
                 }
@@ -1080,38 +1089,39 @@ extension TProgressHUD {
         } else {
             keyboardHeight = visibleKeyboardHeight
         }
-        
+
         let orientationFrame = bounds
         let statusBarFrame = UIApplication.shared.statusBarFrame
-        
+
         if motionEffectEnabled {
             updateMotionEffectForOrientation(orientation: orientation)
         }
-        
+
         var activeHeight = CGRectGetHeight(orientationFrame)
         if keyboardHeight > 0 {
             activeHeight += CGRectGetHeight(statusBarFrame) * 2
         }
         activeHeight -= keyboardHeight
-        
+
         let posX = CGRectGetMidX(orientationFrame)
         let posY = floorf(Float(activeHeight) * 0.45)
-        
+
         let rotateAngle = 0
         let newCenter = CGPointMake(posX, CGFloat(posY))
-        
+
         if notification != nil {
             UIView.animate(
                 withDuration: animationDuration,
                 delay: 0,
-                options: [.allowUserInteraction, .beginFromCurrentState]) { [weak self] in
-                    guard let self = self else { return }
-                    self.moveToPoint(
-                        newCenter: newCenter,
-                        rotateAngle: CGFloat(rotateAngle)
-                    )
-                    self.hudView.setNeedsDisplay()
-                }
+                options: [.allowUserInteraction, .beginFromCurrentState]
+            ) { [weak self] in
+                guard let self = self else { return }
+                self.moveToPoint(
+                    newCenter: newCenter,
+                    rotateAngle: CGFloat(rotateAngle)
+                )
+                self.hudView.setNeedsDisplay()
+            }
         } else {
             moveToPoint(
                 newCenter: newCenter,
@@ -1119,18 +1129,18 @@ extension TProgressHUD {
             )
         }
     }
-    
+
     @objc
     private func dismiss() {
         dismissWithDelay(delay: 0, completion: nil)
     }
-    
+
     private func dismissWithDelay(
         delay: TimeInterval,
         completion: TProgressHUDDismissCompletion
     ) {
         weak var weakSelf = self
-        
+
         OperationQueue.main.addOperation {
             guard let strongSelf = weakSelf else { return }
 
@@ -1139,19 +1149,19 @@ extension TProgressHUD {
                 object: nil,
                 userInfo: strongSelf.notificationUserInfo
             )
-            
+
             strongSelf.activityCount = 0
-            
+
             let animationsBlock: () -> Void = {
                 strongSelf.hudView.transform = CGAffineTransformScale(
                     strongSelf.hudView.transform,
-                    1.0/1.3,
-                    1.0/1.3
+                    1.0 / 1.3,
+                    1.0 / 1.3
                 )
-                
+
                 strongSelf.fadeOutEffects()
             }
-            
+
             let completionBlock: () -> Void = { [weak self] in
                 guard let self = self else { return }
                 if self.backgroundView.alpha == 0 {
@@ -1159,32 +1169,32 @@ extension TProgressHUD {
                     strongSelf.backgroundView.removeFromSuperview()
                     strongSelf.hudView.removeFromSuperview()
                     strongSelf.removeFromSuperview()
-                    
+
                     strongSelf.progress = TProgressHUDUndefinedProgress
                     strongSelf.cancelRingLayerAnimation()
                     strongSelf.cancelIndefiniteAnimatedViewAnimation()
-                    
+
                     NotificationCenter.default.removeObserver(strongSelf)
                     NotificationCenter.default.post(
                         name: NSNotification.Name(TProgressHUDDidDisappearNotification),
                         object: strongSelf,
                         userInfo: notificationUserInfo
                     )
-                    
+
                     if let rootController = UIApplication.shared.keyWindow?.rootViewController {
                         rootController.setNeedsStatusBarAppearanceUpdate()
                     }
-                    
+
                     if completion != nil {
                         completion!()
                     }
                 }
             }
-            
+
             let dipatchTime = DispatchTime.now() + delay
             DispatchQueue.main.asyncAfter(deadline: dipatchTime) {
                 strongSelf.graceTimer = nil
-                
+
                 if strongSelf.fadeOutAnimationDuration > 0 {
                     UIView.animate(
                         withDuration: strongSelf.fadeOutAnimationDuration,
@@ -1202,83 +1212,82 @@ extension TProgressHUD {
                     completionBlock()
                 }
             }
-            
+
             strongSelf.setNeedsDisplay()
         }
     }
 }
 
-
 // MARK: - Private Show/Dismiss Functions
+
 extension TProgressHUD {
     private func showProgress(
         progress: CGFloat,
         status: String
     ) {
-        weak var weakSelf = self
-        OperationQueue.main.addOperation {
-            guard let strongSelf = weakSelf else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
-            if strongSelf.fadeOutTimer != nil {
-                strongSelf.activityCount = 0
+            if self.fadeOutTimer != nil {
+                self.activityCount = 0
             }
-            
-            strongSelf.fadeOutTimer = nil
-            strongSelf.graceTimer = nil
-            strongSelf.updateViewHierarchy()
-            
-            strongSelf.imageView.isHidden = true
-            strongSelf.imageView.image = nil
-            
-            strongSelf.statusLabel.isHidden = status.isEmpty
-            strongSelf.statusLabel.text = status
-            strongSelf.progress = progress
-            
+
+            self.fadeOutTimer = nil
+            self.graceTimer = nil
+            self.updateViewHierarchy()
+
+            self.imageView.isHidden = true
+            self.imageView.image = nil
+
+            self.statusLabel.isHidden = status.isEmpty
+            self.statusLabel.text = status
+            self.progress = progress
+
             if progress >= 0 {
-                strongSelf.cancelIndefiniteAnimatedViewAnimation()
-                
-                if strongSelf.ringView.superview == nil {
-                    strongSelf.hudView.contentView.addSubview(strongSelf.ringView)
+                self.cancelIndefiniteAnimatedViewAnimation()
+
+                if self.ringView.superview == nil {
+                    self.hudView.contentView.addSubview(self.ringView)
                 }
-                if strongSelf.backgroundRingView.superview == nil {
-                    strongSelf.hudView.contentView.addSubview(strongSelf.backgroundRingView)
+                if self.backgroundRingView.superview == nil {
+                    self.hudView.contentView.addSubview(self.backgroundRingView)
                 }
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)
-                strongSelf.ringView.strokeEnd = progress
+                self.ringView.strokeEnd = progress
                 CATransaction.commit()
-                
+
                 if progress == 0 {
-                    strongSelf.activityCount += 1
+                    self.activityCount += 1
                 }
             } else {
-                strongSelf.cancelRingLayerAnimation()
-                strongSelf.hudView.contentView.addSubview(strongSelf.indefiniteAnimatedView)
-                
-                if strongSelf.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
-                    strongSelf.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
+                self.cancelRingLayerAnimation()
+                self.hudView.contentView.addSubview(self.indefiniteAnimatedView)
+
+                if self.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
+                    self.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
                 }
-                
-                strongSelf.activityCount += 1
+
+                self.activityCount += 1
             }
-            
-            if self.graceTimeInterval > 0 && self.backgroundView.alpha == 0 {
-                strongSelf.graceTimer = Timer(
+
+            if self.graceTimeInterval > 0, self.backgroundView.alpha == 0 {
+                self.graceTimer = Timer(
                     timeInterval: self.graceTimeInterval,
-                    target: strongSelf,
+                    target: self,
                     selector: #selector(self.fadeIn),
                     userInfo: nil,
                     repeats: false
                 )
-                RunLoop.main.add(strongSelf.graceTimer!, forMode: RunLoop.Mode.common)
+                RunLoop.main.add(self.graceTimer!, forMode: RunLoop.Mode.common)
             } else {
-                strongSelf.fadeIn(nil)
+                self.fadeIn(nil)
             }
-            
-            strongSelf.hapticGenerator?.prepare()
+
+            self.hapticGenerator?.prepare()
         }
     }
-    
+
     private func updateViewHierarchy() {
         if controlView.superview == nil {
             if containerView != nil {
@@ -1289,45 +1298,45 @@ extension TProgressHUD {
         } else {
             controlView.superview!.bringSubviewToFront(controlView)
         }
-        
+
         if superview == nil {
             controlView.addSubview(self)
         }
     }
-    
+
     private func cancelIndefiniteAnimatedViewAnimation() {
         if indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.stopAnimating)) {
             indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.stopAnimating))
         }
-        
+
         indefiniteAnimatedView.removeFromSuperview()
     }
-    
+
     private func cancelRingLayerAnimation() {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        
+
         hudView.layer.removeAllAnimations()
         ringView.strokeEnd = 0
-        
+
         CATransaction.commit()
-        
+
         ringView.removeFromSuperview()
         backgroundRingView.removeFromSuperview()
     }
-    
+
     private func updateMotionEffectForOrientation(
         orientation: UIInterfaceOrientation
     ) {
         let xMotionEffectType: UIInterpolatingMotionEffect.EffectType = orientation.isPortrait ? .tiltAlongHorizontalAxis : .tiltAlongVerticalAxis
         let yMotionEffectType: UIInterpolatingMotionEffect.EffectType = orientation.isPortrait ? .tiltAlongVerticalAxis : .tiltAlongHorizontalAxis
-        
+
         updateMotionEffectForXMotionEffectType(
             xMotionEffectType,
             yMotionEffectType: yMotionEffectType
         )
     }
-    
+
     private func updateMotionEffectForXMotionEffectType(
         _ xMotionEffectType: UIInterpolatingMotionEffect.EffectType,
         yMotionEffectType: UIInterpolatingMotionEffect.EffectType
@@ -1342,17 +1351,17 @@ extension TProgressHUD {
 
         let effectGroup = UIMotionEffectGroup()
         effectGroup.motionEffects = [effectX, effectY]
-        
+
         hudView.motionEffects = []
         hudView.addMotionEffect(effectGroup)
     }
-    
+
     private func moveToPoint(
         newCenter: CGPoint,
         rotateAngle angle: CGFloat
     ) {
         hudView.transform = CGAffineTransformMakeRotation(angle)
-        
+
         if containerView != nil {
             hudView.center = CGPointMake(
                 containerView!.center.x + offsetFromCenter.horizontal,
@@ -1365,7 +1374,7 @@ extension TProgressHUD {
             )
         }
     }
-    
+
     private func fadeInEffects() {
         if defaultStyle != .custom {
             let blurEffectStyle = defaultStyle == .dark ? UIBlurEffect.Style.dark : UIBlurEffect.Style.light
@@ -1376,7 +1385,7 @@ extension TProgressHUD {
             hudView.effect = hudViewCustomBlurEffect
             hudView.backgroundColor = backgroundColorForStyle
         }
-        
+
         backgroundView.alpha = 1.0
         imageView.alpha = 1.0
         statusLabel.alpha = 1.0
@@ -1384,7 +1393,7 @@ extension TProgressHUD {
         ringView.alpha = 1.0
         backgroundView.alpha = 1.0
     }
-    
+
     private func registerNotifications() {
         NotificationCenter.default.addObserver(
             self,
@@ -1392,35 +1401,35 @@ extension TProgressHUD {
             name: UIApplication.didChangeStatusBarOrientationNotification,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(positionHUD(notification:)),
             name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(positionHUD(notification:)),
             name: UIResponder.keyboardDidHideNotification,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(positionHUD(notification:)),
             name: UIResponder.keyboardWillShowNotification,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(positionHUD(notification:)),
             name: UIResponder.keyboardDidShowNotification,
             object: nil
         )
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(positionHUD(notification:)),
@@ -1428,12 +1437,12 @@ extension TProgressHUD {
             object: nil
         )
     }
-    
+
     private func fadeOutEffects() {
         if defaultStyle != .custom {
             hudView.effect = nil
         }
-        
+
         hudView.backgroundColor = .clear
         backgroundView.alpha = 0
         imageView.alpha = 0
@@ -1442,24 +1451,24 @@ extension TProgressHUD {
         ringView.alpha = 0
         backgroundRingView.alpha = 0
     }
-    
+
     private func showImage(
         image: UIImage,
         status: String,
         duration: TimeInterval
     ) {
         weak var weakSelf = self
-        
+
         OperationQueue.main.addOperation {
             guard let strongSelf = weakSelf else { return }
             strongSelf.fadeOutTimer = nil
             strongSelf.graceTimer = nil
             strongSelf.updateViewHierarchy()
-            
+
             strongSelf.progress = TProgressHUDUndefinedProgress
             strongSelf.cancelRingLayerAnimation()
             strongSelf.cancelIndefiniteAnimatedViewAnimation()
-            
+
             if self.shouldTintImages {
                 if image.renderingMode != .alwaysTemplate {
                     strongSelf.imageView.image = image.withRenderingMode(.alwaysTemplate)
@@ -1471,11 +1480,11 @@ extension TProgressHUD {
                 strongSelf.imageView.image = image
             }
             strongSelf.imageView.isHidden = false
-            
+
             strongSelf.statusLabel.isHidden = status.isEmpty
             strongSelf.statusLabel.text = status
-            
-            if self.graceTimeInterval > 0 && self.backgroundView.alpha == 0 {
+
+            if self.graceTimeInterval > 0, self.backgroundView.alpha == 0 {
                 strongSelf.graceTimer = Timer(
                     timeInterval: self.graceTimeInterval,
                     target: strongSelf,
