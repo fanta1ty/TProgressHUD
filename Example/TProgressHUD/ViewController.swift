@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TProgressHUD
 
 class ViewController: UIViewController {
 
@@ -20,5 +21,8 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func onShow(_ sender: Any) {
+        TProgressHUD.show()
+    }
 }
 

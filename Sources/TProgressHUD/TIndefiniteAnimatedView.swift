@@ -84,11 +84,20 @@ public class TIndefiniteAnimatedView: UIView {
                 _indefiniteAnimatedLayer!.path = smoothedPath.cgPath
 
                 let maskLayer = CALayer()
+                #if SWIFT_PACKAGE
                 maskLayer.contents = UIImage(
                     named: "angle-mask",
                     in: .module,
                     compatibleWith: nil
                 )!.cgImage
+                #else
+                let localBundle = Bundle(for: self)
+                maskLayer.contents = UIImage(
+                    named: "angle-mask",
+                    in: localBundle,
+                    compatibleWith: nil
+                )!.cgImage
+                #endif
 
                 maskLayer.frame = _indefiniteAnimatedLayer!.bounds
                 _indefiniteAnimatedLayer!.mask = maskLayer

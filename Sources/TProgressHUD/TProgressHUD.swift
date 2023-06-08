@@ -65,9 +65,18 @@ public class TProgressHUD: UIView {
     public var backgroundLayerColor: UIColor = .init(white: 0, alpha: 0.4)
     public var imageViewSize: CGSize = .init(width: 28, height: 28)
     public var shouldTintImages: Bool = true
+    #if SWIFT_PACKAGE
     public var infoImage: UIImage = .init(named: "info", in: .module, compatibleWith: nil)!
     public var successImage: UIImage = .init(named: "success", in: .module, compatibleWith: nil)!
     public var errorImage: UIImage = .init(named: "error", in: .module, compatibleWith: nil)!
+    #else
+    private static var localBundler: Bundle {
+        Bundle(for: self)
+    }
+    public var infoImage: UIImage = .init(named: "info", in: localBundler, compatibleWith: nil)!
+    public var successImage: UIImage = .init(named: "success", in: localBundler, compatibleWith: nil)!
+    public var errorImage: UIImage = .init(named: "error", in: localBundler, compatibleWith: nil)!
+    #endif
     public var viewForExtension: UIView? = nil
     public var graceTimeInterval: TimeInterval = 0
     public var minimumDismissTimeInterval: TimeInterval = 5
@@ -463,9 +472,16 @@ public class TProgressHUD: UIView {
         self.imageViewSize = .init(width: 28, height: 28)
         self.shouldTintImages = true
 
+        #if SWIFT_PACKAGE
         self.infoImage = UIImage(named: "info", in: .module, compatibleWith: nil)!
         self.successImage = UIImage(named: "success", in: .module, compatibleWith: nil)!
         self.errorImage = UIImage(named: "error", in: .module, compatibleWith: nil)!
+        #else
+        let localBundle = Bundle(for: self)
+        self.infoImage = UIImage(named: "info", in: localBundle, compatibleWith: nil)!
+        self.successImage = UIImage(named: "success", in: localBundle, compatibleWith: nil)!
+        self.errorImage = UIImage(named: "error", in: localBundle, compatibleWith: nil)!
+        #endif
 
         self.ringThickness = 2
         self.ringRadius = 18
