@@ -65,18 +65,9 @@ public class TProgressHUD: UIView {
     public var backgroundLayerColor: UIColor = .init(white: 0, alpha: 0.4)
     public var imageViewSize: CGSize = .init(width: 28, height: 28)
     public var shouldTintImages: Bool = true
-    #if SWIFT_PACKAGE
-    public var infoImage: UIImage = .init(named: "info", in: .module, compatibleWith: nil)!
-    public var successImage: UIImage = .init(named: "success", in: .module, compatibleWith: nil)!
-    public var errorImage: UIImage = .init(named: "error", in: .module, compatibleWith: nil)!
-    #else
-    private static var localBundler: Bundle {
-        Bundle(for: self)
-    }
-    public var infoImage: UIImage = .init(named: "info", in: localBundler, compatibleWith: nil)!
-    public var successImage: UIImage = .init(named: "success", in: localBundler, compatibleWith: nil)!
-    public var errorImage: UIImage = .init(named: "error", in: localBundler, compatibleWith: nil)!
-    #endif
+    public var infoImage: UIImage = .init(named: "info", in: bundle, compatibleWith: nil)!
+    public var successImage: UIImage = .init(named: "success", in: bundle, compatibleWith: nil)!
+    public var errorImage: UIImage = .init(named: "error", in: bundle, compatibleWith: nil)!
     public var viewForExtension: UIView? = nil
     public var graceTimeInterval: TimeInterval = 0
     public var minimumDismissTimeInterval: TimeInterval = 5
@@ -90,12 +81,18 @@ public class TProgressHUD: UIView {
 
     public var fadeInAnimationDuration: TimeInterval = 0.15
     public var fadeOutAnimationDuration: TimeInterval = 0.15
-
     public var maxSupportedWindowLevel: UIWindow.Level = .normal
-
     public var hapticsEnabled: Bool = false
     public var motionEffectEnabled: Bool = true
 
+    private static var bundle: Bundle {
+        #if SWIFT_PACKAGE
+        Bundle.module
+        #else
+        Bundle(for: TProgressHUD.self)
+        #endif
+    }
+    
     private var _graceTimer: Timer?
     private var graceTimer: Timer? {
         get { _graceTimer }
@@ -471,13 +468,13 @@ public class TProgressHUD: UIView {
 
         self.imageViewSize = .init(width: 28, height: 28)
         self.shouldTintImages = true
-
+        
         #if SWIFT_PACKAGE
         self.infoImage = UIImage(named: "info", in: .module, compatibleWith: nil)!
         self.successImage = UIImage(named: "success", in: .module, compatibleWith: nil)!
         self.errorImage = UIImage(named: "error", in: .module, compatibleWith: nil)!
         #else
-        let localBundle = Bundle(for: self)
+        let localBundle = Bundle(for: TProgressHUD.self)
         self.infoImage = UIImage(named: "info", in: localBundle, compatibleWith: nil)!
         self.successImage = UIImage(named: "success", in: localBundle, compatibleWith: nil)!
         self.errorImage = UIImage(named: "error", in: localBundle, compatibleWith: nil)!
@@ -495,9 +492,7 @@ public class TProgressHUD: UIView {
 
         self.fadeInAnimationDuration = TProgressHUDDefaultAnimationDuration
         self.fadeOutAnimationDuration = TProgressHUDDefaultAnimationDuration
-
         self.maxSupportedWindowLevel = .normal
-
         self.hapticsEnabled = false
         self.motionEffectEnabled = true
 
@@ -1025,7 +1020,6 @@ extension TProgressHUD {
                         object: self,
                         userInfo: notificationUserInfo
                     )
-
                     UIAccessibility.post(notification: .screenChanged, argument: nil)
                     UIAccessibility.post(notification: .announcement, argument: statusLabel.text)
 

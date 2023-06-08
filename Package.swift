@@ -20,5 +20,6 @@ let package = Package(
         .testTarget(
             name: "TProgressHUDTests",
             dependencies: ["TProgressHUD"])
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )

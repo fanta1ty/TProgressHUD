@@ -91,7 +91,7 @@ public class TIndefiniteAnimatedView: UIView {
                     compatibleWith: nil
                 )!.cgImage
                 #else
-                let localBundle = Bundle(for: self)
+                let localBundle = Bundle(for: TProgressHUD.self)
                 maskLayer.contents = UIImage(
                     named: "angle-mask",
                     in: localBundle,
@@ -104,7 +104,6 @@ public class TIndefiniteAnimatedView: UIView {
 
                 let animationDuration: TimeInterval = 1
                 let linearCurve = CAMediaTimingFunction(name: .linear)
-
                 let animation = CABasicAnimation(keyPath: "transform.rotation")
                 animation.fromValue = 0
                 animation.toValue = CGFloat.pi * 2
