@@ -1,3 +1,5 @@
+![Logo](https://github.com/fanta1ty/TProgressHUD/blob/master/Logo/Logo.png)
+
 # TProgressHUD
 
 [![Swift 5.0](https://img.shields.io/badge/Swift-5.0-brightgreen)](https://developer.apple.com/swift/)
