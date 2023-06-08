@@ -6,6 +6,7 @@
 [![Version](https://img.shields.io/cocoapods/v/TProgressHUD.svg?style=flat)](https://cocoapods.org/pods/TProgressHUD)
 [![License](https://img.shields.io/cocoapods/l/TProgressHUD.svg?style=flat)](https://cocoapods.org/pods/TProgressHUD)
 [![Platform](https://img.shields.io/cocoapods/p/TProgressHUD.svg?style=flat)](https://cocoapods.org/pods/TProgressHUD)
+[![Email](https://img.shields.io/badge/contact-@thinhnguyen12389@gmail.com-blue)](thinhnguyen12389@gmail.com)
 
 `TProgressHUD` is a clean and easy-to-use HUD meant to display the progress of an ongoing task on iOS
 
