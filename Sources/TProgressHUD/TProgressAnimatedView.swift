@@ -9,17 +9,67 @@ import Foundation
 import UIKit
 
 public class TProgressAnimatedView: UIView {
-    public var radius: CGFloat = 0.0
-    public var strokeThickness: CGFloat = 0.0
-    public var strokeColor: UIColor?
-    public var strokeEnd: CGFloat = 0.0
+    private var _radius: CGFloat = 0.0
+    public var radius: CGFloat {
+        get { _radius }
+        set {
+            if newValue != _radius {
+                _radius = newValue
+
+                if _ringAnimatedLayer != nil {
+                    _ringAnimatedLayer!.removeFromSuperlayer()
+                    _ringAnimatedLayer = nil
+                }
+
+                if superview != nil {
+                    layoutAnimatedLayer()
+                }
+            }
+        }
+    }
+
+    private var _strokeThickness: CGFloat = 0.0
+    public var strokeThickness: CGFloat {
+        get { _strokeThickness }
+        set {
+            _strokeThickness = newValue
+
+            if _ringAnimatedLayer != nil {
+                _ringAnimatedLayer!.lineWidth = newValue
+            }
+        }
+    }
+
+    private var _strokeColor: UIColor?
+    public var strokeColor: UIColor? {
+        get { _strokeColor }
+        set {
+            _strokeColor = newValue
+
+            if _ringAnimatedLayer != nil, newValue != nil {
+                _ringAnimatedLayer!.strokeColor = newValue!.cgColor
+            }
+        }
+    }
+
+    private var _strokeEnd: CGFloat = 0.0
+    public var strokeEnd: CGFloat {
+        get { _strokeEnd }
+        set {
+            _strokeEnd = newValue
+
+            if _ringAnimatedLayer != nil {
+                _ringAnimatedLayer!.strokeEnd = newValue
+            }
+        }
+    }
 
     private var _ringAnimatedLayer: CAShapeLayer?
     public var ringAnimatedLayer: CAShapeLayer {
         if _ringAnimatedLayer == nil {
-            let arcCenter = CGPoint(
-                x: radius + strokeThickness / 2 + 5,
-                y: radius + strokeThickness / 2 + 5
+            let arcCenter = CGPointMake(
+                radius + strokeThickness / 2 + 5,
+                radius + strokeThickness / 2 + 5
             )
 
             let smoothedPath = UIBezierPath(
@@ -52,24 +102,17 @@ public class TProgressAnimatedView: UIView {
         if newSuperview != nil {
             layoutAnimatedLayer()
         } else {
-            ringAnimatedLayer.removeFromSuperlayer()
+            if _ringAnimatedLayer != nil {
+                _ringAnimatedLayer!.removeFromSuperlayer()
+                _ringAnimatedLayer = nil
+            }
         }
-    }
-
-    private func layoutAnimatedLayer() {
-        let newLayer = ringAnimatedLayer
-        layer.addSublayer(newLayer)
-
-        let widthDiff: CGFloat = bounds.size.width - newLayer.bounds.size.width
-        let heightDiff: CGFloat = bounds.size.height - newLayer.bounds.size.height
-        newLayer.position.x += widthDiff / 2.0 - widthDiff / 2.0
-        newLayer.position.y += heightDiff / 2.0 - heightDiff / 2.0
     }
 
     override public var frame: CGRect {
         get { super.frame }
         set {
-            if !newValue.equalTo(super.frame) {
+            if !CGRectEqualToRect(newValue, super.frame) {
                 super.frame = newValue
 
                 if superview != nil {
@@ -83,6 +126,21 @@ public class TProgressAnimatedView: UIView {
         CGSize(
             width: (radius + strokeThickness / 2 + 5) * 2,
             height: (radius + strokeThickness / 2 + 5) * 2
+        )
+    }
+}
+
+// MARK: - Private Functions
+
+extension TProgressAnimatedView {
+    private func layoutAnimatedLayer() {
+        layer.addSublayer(ringAnimatedLayer)
+
+        let widthDiff: CGFloat = CGRectGetWidth(bounds) - CGRectGetWidth(ringAnimatedLayer.bounds)
+        let heightDiff: CGFloat = CGRectGetHeight(bounds) - CGRectGetHeight(ringAnimatedLayer.bounds)
+        ringAnimatedLayer.position = CGPointMake(
+            CGRectGetWidth(bounds) - CGRectGetWidth(ringAnimatedLayer.bounds) / 2 - widthDiff / 2,
+            CGRectGetHeight(bounds) - CGRectGetHeight(ringAnimatedLayer.bounds) / 2 - heightDiff / 2
         )
     }
 }

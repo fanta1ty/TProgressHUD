@@ -47,10 +47,8 @@ private let TProgressHUDHorizontalSpacing: CGFloat = 12.0
 private let TProgressHUDLabelSpacing: CGFloat = 8.0
 
 public class TProgressHUD: UIView {
-    public static let sharedView = TProgressHUD(
-        frame: UIApplication.shared.delegate?.window??.bounds ?? .zero
-    )
-
+    public static let sharedView = TProgressHUD(frame: UIApplication.shared.delegate?.window??.bounds ?? .zero)
+    
     public var defaultStyle: TProgressHUDStyle = .light
     public var defaultMaskType: TProgressHUDMaskType = .none
     public var defaultAnimationType: TProgressHUDAnimationType = .flat
@@ -236,7 +234,7 @@ public class TProgressHUD: UIView {
     private var _imageView: UIImageView?
     private var imageView: UIImageView {
         get {
-            if _imageView != nil, CGSizeEqualToSize(_imageView!.bounds.size, imageViewSize) {
+            if _imageView != nil, !CGSizeEqualToSize(_imageView!.bounds.size, imageViewSize) {
                 _imageView!.removeFromSuperview()
                 _imageView = nil
             }
@@ -273,7 +271,7 @@ public class TProgressHUD: UIView {
                 if let animatedView = _indefiniteAnimatedView as? TIndefiniteAnimatedView {
                     animatedView.strokeColor = foregroundColorForStyle
                     animatedView.strokeThickness = ringThickness
-                    animatedView.radius = statusLabel.text != nil ? ringRadius : ringNoTextRadius
+                    animatedView.radius = (statusLabel.text != nil && !statusLabel.text!.isEmpty) ? ringRadius : ringNoTextRadius
                 }
             } else {
                 if _indefiniteAnimatedView != nil, !(_indefiniteAnimatedView is UIActivityIndicatorView) {
@@ -304,7 +302,7 @@ public class TProgressHUD: UIView {
             }
             _ringView!.strokeColor = foregroundImageColorForStyle
             _ringView!.strokeThickness = ringThickness
-            _ringView!.radius = statusLabel.text != nil ? ringRadius : ringNoTextRadius
+            _ringView!.radius = (statusLabel.text != nil && !statusLabel.text!.isEmpty) ? ringRadius : ringNoTextRadius
             return _ringView!
         }
         set { _ringView = newValue }
@@ -320,7 +318,7 @@ public class TProgressHUD: UIView {
 
             _backgroundRingView!.strokeColor = foregroundColorForStyle.withAlphaComponent(0.1)
             _backgroundRingView!.strokeThickness = ringThickness
-            _backgroundRingView!.radius = statusLabel.text != nil ? ringRadius : ringNoTextRadius
+            _backgroundRingView!.radius = (statusLabel.text != nil && !statusLabel.text!.isEmpty) ? ringRadius : ringNoTextRadius
             return _backgroundRingView!
         }
         set { _backgroundRingView = newValue }
@@ -435,7 +433,7 @@ public class TProgressHUD: UIView {
     }
 
     private var notificationUserInfo: [AnyHashable: Any]? {
-        statusLabel.text != nil ? [TProgressHUDStatusUserInfoKey: statusLabel.text!] : nil
+        (statusLabel.text != nil && !statusLabel.text!.isEmpty) ? [TProgressHUDStatusUserInfoKey: statusLabel.text!] : nil
     }
 
     override public init(frame: CGRect) {
@@ -485,7 +483,7 @@ public class TProgressHUD: UIView {
         self.maxSupportedWindowLevel = .normal
 
         self.hapticsEnabled = false
-        self.motionEffectEnabled = false
+        self.motionEffectEnabled = true
 
         accessibilityIdentifier = "TProgressHUD"
         isAccessibilityElement = true
@@ -869,7 +867,7 @@ extension TProgressHUD {
         var labelHeight: CGFloat = 0
         var labelWidth: CGFloat = 0
 
-        if statusLabel.text != nil {
+        if statusLabel.text != nil && !statusLabel.text!.isEmpty {
             let constraintSize = CGSizeMake(200, 300)
             labelRect = (statusLabel.text! as NSString).boundingRect(
                 with: constraintSize,
@@ -893,7 +891,7 @@ extension TProgressHUD {
         hudWidth = TProgressHUDHorizontalSpacing + CGFloat.maximum(labelWidth, contentWidth) + TProgressHUDHorizontalSpacing
         hudHeight = TProgressHUDVerticalSpacing + labelHeight + contentHeight + TProgressHUDVerticalSpacing
 
-        if statusLabel.text != nil && (imageUsed || progressUsed) {
+        if (statusLabel.text != nil && !statusLabel.text!.isEmpty) && (imageUsed || progressUsed) {
             hudHeight += TProgressHUDLabelSpacing
         }
 
@@ -903,7 +901,7 @@ extension TProgressHUD {
         CATransaction.setDisableActions(true)
 
         var centerY: CGFloat = 0
-        if statusLabel.text != nil {
+        if statusLabel.text != nil && !statusLabel.text!.isEmpty {
             let yOffset = CGFloat.maximum(
                 TProgressHUDVerticalSpacing,
                 (minimumSize.height - contentHeight - TProgressHUDLabelSpacing - labelHeight) / 2.0
@@ -1142,45 +1140,43 @@ extension TProgressHUD {
         delay: TimeInterval,
         completion: TProgressHUDDismissCompletion
     ) {
-        weak var weakSelf = self
-
-        OperationQueue.main.addOperation {
-            guard let strongSelf = weakSelf else { return }
-
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
             NotificationCenter.default.post(
                 name: Notification.Name(TProgressHUDWillDisappearNotification),
                 object: nil,
-                userInfo: strongSelf.notificationUserInfo
+                userInfo: self.notificationUserInfo
             )
 
-            strongSelf.activityCount = 0
+            self.activityCount = 0
 
             let animationsBlock: () -> Void = {
-                strongSelf.hudView.transform = CGAffineTransformScale(
-                    strongSelf.hudView.transform,
+                self.hudView.transform = CGAffineTransformScale(
+                    self.hudView.transform,
                     1.0 / 1.3,
                     1.0 / 1.3
                 )
 
-                strongSelf.fadeOutEffects()
+                self.fadeOutEffects()
             }
 
             let completionBlock: () -> Void = { [weak self] in
                 guard let self = self else { return }
                 if self.backgroundView.alpha == 0 {
-                    strongSelf.controlView.removeFromSuperview()
-                    strongSelf.backgroundView.removeFromSuperview()
-                    strongSelf.hudView.removeFromSuperview()
-                    strongSelf.removeFromSuperview()
+                    self.controlView.removeFromSuperview()
+                    self.backgroundView.removeFromSuperview()
+                    self.hudView.removeFromSuperview()
+                    self.removeFromSuperview()
 
-                    strongSelf.progress = TProgressHUDUndefinedProgress
-                    strongSelf.cancelRingLayerAnimation()
-                    strongSelf.cancelIndefiniteAnimatedViewAnimation()
+                    self.progress = TProgressHUDUndefinedProgress
+                    self.cancelRingLayerAnimation()
+                    self.cancelIndefiniteAnimatedViewAnimation()
 
-                    NotificationCenter.default.removeObserver(strongSelf)
+                    NotificationCenter.default.removeObserver(self)
                     NotificationCenter.default.post(
                         name: NSNotification.Name(TProgressHUDDidDisappearNotification),
-                        object: strongSelf,
+                        object: self,
                         userInfo: notificationUserInfo
                     )
 
@@ -1193,14 +1189,14 @@ extension TProgressHUD {
                     }
                 }
             }
-
+            
             let dipatchTime = DispatchTime.now() + delay
             DispatchQueue.main.asyncAfter(deadline: dipatchTime) {
-                strongSelf.graceTimer = nil
+                self.graceTimer = nil
 
-                if strongSelf.fadeOutAnimationDuration > 0 {
+                if self.fadeOutAnimationDuration > 0 {
                     UIView.animate(
-                        withDuration: strongSelf.fadeOutAnimationDuration,
+                        withDuration: self.fadeOutAnimationDuration,
                         delay: 0,
                         options: [.allowUserInteraction, .curveEaseOut, .beginFromCurrentState],
                         animations: {
@@ -1216,7 +1212,7 @@ extension TProgressHUD {
                 }
             }
 
-            strongSelf.setNeedsDisplay()
+            self.setNeedsDisplay()
         }
     }
 }
@@ -1228,67 +1224,66 @@ extension TProgressHUD {
         progress: CGFloat,
         status: String
     ) {
-        weak var weakSelf = self
-        OperationQueue.main.addOperation {
-            guard let strongSelf = weakSelf else { return }
-
-            if strongSelf.fadeOutTimer != nil {
-                strongSelf.activityCount = 0
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            if self.fadeOutTimer != nil {
+                self.activityCount = 0
             }
 
-            strongSelf.fadeOutTimer = nil
-            strongSelf.graceTimer = nil
-            strongSelf.updateViewHierarchy()
+            self.fadeOutTimer = nil
+            self.graceTimer = nil
+            self.updateViewHierarchy()
 
-            strongSelf.imageView.isHidden = true
-            strongSelf.imageView.image = nil
+            self.imageView.isHidden = true
+            self.imageView.image = nil
 
-            strongSelf.statusLabel.isHidden = status.isEmpty
-            strongSelf.statusLabel.text = status
-            strongSelf.progress = progress
+            self.statusLabel.isHidden = status.isEmpty
+            self.statusLabel.text = status
+            self.progress = progress
 
             if progress >= 0 {
-                strongSelf.cancelIndefiniteAnimatedViewAnimation()
+                self.cancelIndefiniteAnimatedViewAnimation()
 
-                if strongSelf.ringView.superview == nil {
-                    strongSelf.hudView.contentView.addSubview(strongSelf.ringView)
+                if self.ringView.superview == nil {
+                    self.hudView.contentView.addSubview(self.ringView)
                 }
-                if strongSelf.backgroundRingView.superview == nil {
-                    strongSelf.hudView.contentView.addSubview(strongSelf.backgroundRingView)
+                if self.backgroundRingView.superview == nil {
+                    self.hudView.contentView.addSubview(self.backgroundRingView)
                 }
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)
-                strongSelf.ringView.strokeEnd = progress
+                self.ringView.strokeEnd = progress
                 CATransaction.commit()
 
                 if progress == 0 {
-                    strongSelf.activityCount += 1
+                    self.activityCount += 1
                 }
             } else {
-                strongSelf.cancelRingLayerAnimation()
-                strongSelf.hudView.contentView.addSubview(strongSelf.indefiniteAnimatedView)
+                self.cancelRingLayerAnimation()
+                self.hudView.contentView.addSubview(self.indefiniteAnimatedView)
 
-                if strongSelf.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
-                    strongSelf.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
+                if self.indefiniteAnimatedView.responds(to: #selector(UIActivityIndicatorView.startAnimating)) {
+                    self.indefiniteAnimatedView.perform(#selector(UIActivityIndicatorView.startAnimating))
                 }
 
-                strongSelf.activityCount += 1
+                self.activityCount += 1
             }
 
             if self.graceTimeInterval > 0, self.backgroundView.alpha == 0 {
-                strongSelf.graceTimer = Timer(
+                self.graceTimer = Timer(
                     timeInterval: self.graceTimeInterval,
-                    target: strongSelf,
+                    target: self,
                     selector: #selector(self.fadeIn),
                     userInfo: nil,
                     repeats: false
                 )
-                RunLoop.main.add(strongSelf.graceTimer!, forMode: RunLoop.Mode.common)
+                RunLoop.main.add(self.graceTimer!, forMode: RunLoop.Mode.common)
             } else {
-                strongSelf.fadeIn(nil)
+                self.fadeIn(nil)
             }
 
-            strongSelf.hapticGenerator?.prepare()
+            self.hapticGenerator?.prepare()
         }
     }
 
@@ -1461,44 +1456,43 @@ extension TProgressHUD {
         status: String,
         duration: TimeInterval
     ) {
-        weak var weakSelf = self
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.fadeOutTimer = nil
+            self.graceTimer = nil
+            self.updateViewHierarchy()
 
-        OperationQueue.main.addOperation {
-            guard let strongSelf = weakSelf else { return }
-            strongSelf.fadeOutTimer = nil
-            strongSelf.graceTimer = nil
-            strongSelf.updateViewHierarchy()
-
-            strongSelf.progress = TProgressHUDUndefinedProgress
-            strongSelf.cancelRingLayerAnimation()
-            strongSelf.cancelIndefiniteAnimatedViewAnimation()
+            self.progress = TProgressHUDUndefinedProgress
+            self.cancelRingLayerAnimation()
+            self.cancelIndefiniteAnimatedViewAnimation()
 
             if self.shouldTintImages {
                 if image.renderingMode != .alwaysTemplate {
-                    strongSelf.imageView.image = image.withRenderingMode(.alwaysTemplate)
+                    self.imageView.image = image.withRenderingMode(.alwaysTemplate)
                 } else {
-                    strongSelf.imageView.image = image
+                    self.imageView.image = image
                 }
-                strongSelf.imageView.tintColor = strongSelf.foregroundImageColorForStyle
+                self.imageView.tintColor = self.foregroundImageColorForStyle
             } else {
-                strongSelf.imageView.image = image
+                self.imageView.image = image
             }
-            strongSelf.imageView.isHidden = false
+            self.imageView.isHidden = false
 
-            strongSelf.statusLabel.isHidden = status.isEmpty
-            strongSelf.statusLabel.text = status
+            self.statusLabel.isHidden = status.isEmpty
+            self.statusLabel.text = status
 
             if self.graceTimeInterval > 0, self.backgroundView.alpha == 0 {
-                strongSelf.graceTimer = Timer(
+                self.graceTimer = Timer(
                     timeInterval: self.graceTimeInterval,
-                    target: strongSelf,
+                    target: self,
                     selector: #selector(self.fadeIn),
                     userInfo: duration,
                     repeats: false
                 )
-                RunLoop.main.add(strongSelf.graceTimer!, forMode: RunLoop.Mode.common)
+                RunLoop.main.add(self.graceTimer!, forMode: RunLoop.Mode.common)
             } else {
-                strongSelf.fadeIn(duration)
+                self.fadeIn(duration)
             }
         }
     }

@@ -9,7 +9,7 @@ import Foundation
 import QuartzCore
 
 public class TRadialGradientLayer: CALayer {
-    var gradientCenter: CGPoint = .zero
+    public var gradientCenter: CGPoint = .zero
 
     public override func draw(in context: CGContext) {
         let locationsCount = 2

@@ -14,36 +14,44 @@ public class TIndefiniteAnimatedView: UIView {
         get { _strokeThickness }
         set {
             _strokeThickness = newValue
-            _indefiniteAnimatedLayer?.lineWidth = newValue
+
+            if _indefiniteAnimatedLayer != nil {
+                _indefiniteAnimatedLayer!.lineWidth = newValue
+            }
         }
     }
-    
+
     private var _radius: CGFloat = 0.0
     public var radius: CGFloat {
         get { _radius }
         set {
             if newValue != _radius {
                 _radius = newValue
-                _indefiniteAnimatedLayer?.removeFromSuperlayer()
-                _indefiniteAnimatedLayer = nil
-                
+
+                if _indefiniteAnimatedLayer != nil {
+                    _indefiniteAnimatedLayer!.removeFromSuperlayer()
+                    _indefiniteAnimatedLayer = nil
+                }
+
                 if superview != nil {
                     layoutAnimatedLayer()
                 }
             }
         }
     }
+
     private var _strokeColor: UIColor?
     public var strokeColor: UIColor? {
         get { _strokeColor }
         set {
-            if newValue != nil {
-                _strokeColor = newValue
-                _indefiniteAnimatedLayer?.strokeColor = newValue!.cgColor
+            _strokeColor = newValue
+
+            if _indefiniteAnimatedLayer != nil {
+                _indefiniteAnimatedLayer!.strokeColor = newValue?.cgColor
             }
         }
     }
-    
+
     private var _indefiniteAnimatedLayer: CAShapeLayer?
     public var indefiniteAnimatedLayer: CAShapeLayer {
         get {
@@ -125,8 +133,10 @@ public class TIndefiniteAnimatedView: UIView {
         if newSuperview != nil {
             layoutAnimatedLayer()
         } else {
-            _indefiniteAnimatedLayer?.removeFromSuperlayer()
-            _indefiniteAnimatedLayer = nil
+            if _indefiniteAnimatedLayer != nil {
+                _indefiniteAnimatedLayer!.removeFromSuperlayer()
+                _indefiniteAnimatedLayer = nil
+            }
         }
     }
 
@@ -134,21 +144,6 @@ public class TIndefiniteAnimatedView: UIView {
         super.layoutSubviews()
 
         layoutAnimatedLayer()
-    }
-
-    public func layoutAnimatedLayer() {
-        let newLayer = indefiniteAnimatedLayer
-
-        if newLayer.superlayer == nil {
-            layer.addSublayer(newLayer)
-        }
-
-        let widthDiff = bounds.size.width - newLayer.bounds.size.width
-        let heightDiff = bounds.size.height - newLayer.bounds.size.height
-        
-        newLayer.position = CGPointMake(
-            CGRectGetWidth(bounds) - CGRectGetWidth(newLayer.bounds) / 2 - widthDiff / 2,
-            CGRectGetHeight(bounds) - CGRectGetHeight(newLayer.bounds) / 2 - heightDiff / 2)
     }
 
     override public var frame: CGRect {
@@ -165,6 +160,27 @@ public class TIndefiniteAnimatedView: UIView {
     }
 
     override public func sizeThatFits(_: CGSize) -> CGSize {
-        CGSize(width: (radius + strokeThickness / 2 + 5) * 2, height: (radius + strokeThickness / 2 + 5) * 2)
+        CGSize(
+            width: (radius + strokeThickness / 2 + 5) * 2,
+            height: (radius + strokeThickness / 2 + 5) * 2
+        )
+    }
+}
+
+// MARK: - Private Functions
+
+extension TIndefiniteAnimatedView {
+    private func layoutAnimatedLayer() {
+        if indefiniteAnimatedLayer.superlayer == nil {
+            layer.addSublayer(indefiniteAnimatedLayer)
+        }
+
+        let widthDiff = CGRectGetWidth(bounds) - CGRectGetWidth(indefiniteAnimatedLayer.bounds)
+        let heightDiff = CGRectGetHeight(bounds) - CGRectGetHeight(indefiniteAnimatedLayer.bounds)
+
+        indefiniteAnimatedLayer.position = CGPointMake(
+            CGRectGetWidth(bounds) - CGRectGetWidth(indefiniteAnimatedLayer.bounds) / 2 - widthDiff / 2,
+            CGRectGetHeight(bounds) - CGRectGetHeight(indefiniteAnimatedLayer.bounds) / 2 - heightDiff / 2
+        )
     }
 }
