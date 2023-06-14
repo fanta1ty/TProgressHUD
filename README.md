@@ -34,6 +34,33 @@ pod install
 .package(url: "https://github.com/fanta1ty/TProgressHUD.git", brand: "master"),
 ```
 
+## Usage
+Using `TProgressHUD` in your app will usually look as simple as this:
+```swift
+TProgressHUD.show()
+TProgressHUD.dismiss()
+```
+
+### Showing the HUD
+
+You can show the status of indeterminate tasks using one of the following:
+```swift
+TProgressHUD.show()
+TProgressHUD.showWithStatus(status: "Status")
+```
+
+If you'd like the HUD to reflect the progress of a task, use one of these:
+```swift
+TProgressHUD.showProgress(progress: 0.1)
+TProgressHUD.showProgress(progress: 0.1, status: "Status")
+```
+
+The HUD can be dismissed using:
+```swift
+TProgressHUD.dismiss()
+TProgressHUD.dismissWithDelay(delay: 1.0)
+```
+
 ## Author
 
 thinhnguyen12389, thinhnguyen12389@gmail.com
