@@ -1083,18 +1083,20 @@ extension TProgressHUD {
         let orientation = UIApplication.shared.statusBarOrientation
 
         if notification != nil {
-            let keyboardInfo = notification!.userInfo as! [String: Any]
-            let keyboardFrame = keyboardInfo[UIResponder.keyboardFrameBeginUserInfoKey] as! CGRect
-            animationDuration = keyboardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double
+            if let keyboardInfo = notification?.userInfo as? [String: Any],
+               let keyboardFrame = keyboardInfo[UIResponder.keyboardFrameBeginUserInfoKey] as? CGRect,
+               let keyboardDuration = keyboardInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
+                animationDuration = keyboardDuration
 
-            if
-                notification!.name == UIResponder.keyboardWillShowNotification ||
-                notification!.name == UIResponder.keyboardDidShowNotification
-            {
-                keyboardHeight = CGRectGetWidth(keyboardFrame)
+                if
+                    notification!.name == UIResponder.keyboardWillShowNotification ||
+                    notification!.name == UIResponder.keyboardDidShowNotification
+                {
+                    keyboardHeight = CGRectGetWidth(keyboardFrame)
 
-                if orientation.isPortrait {
-                    keyboardHeight = CGRectGetHeight(keyboardFrame)
+                    if orientation.isPortrait {
+                        keyboardHeight = CGRectGetHeight(keyboardFrame)
+                    }
                 }
             }
         } else {
